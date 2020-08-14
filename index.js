@@ -103,8 +103,8 @@ const handleResponse = async (err, res) => {
     if (!events.length) return console.log("No Events!")
     const fileStr = await readFileAsync("savedSessions.json", "utf8")
     let savedSessions = JSON.parse(fileStr)
-    let sessions = getTutoringSessionsFromEvents(events)
-    console.log(sessions) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
+    let calendar_sessions = getTutoringSessionsFromEvents(events)
+    console.log(calendar_sessions) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
 }
 
 /**

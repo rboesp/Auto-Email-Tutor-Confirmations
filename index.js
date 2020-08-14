@@ -101,8 +101,8 @@ const handleResponse = async (err, res) => {
     if (err) return console.log("The API returned an error: " + err)
     const events = res.data.items
     if (!events.length) return console.log("No Events!")
-    const fileStr = await readFileAsync("emails.json", "utf8")
-    let emails = JSON.parse(fileStr)
+    const fileStr = await readFileAsync("savedSessions.json", "utf8")
+    let savedSessions = JSON.parse(fileStr)
     let sessions = getTutoringSessionsFromEvents(events)
     console.log(sessions) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
 }

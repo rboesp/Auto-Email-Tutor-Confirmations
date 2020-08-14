@@ -79,7 +79,7 @@ function listEvents(auth) {
         {
             calendarId: "primary",
             timeMin: new Date().toISOString(),
-            maxResults: 10,
+            maxResults: 20,
             singleEvents: true,
             orderBy: "startTime",
         },
@@ -87,15 +87,26 @@ function listEvents(auth) {
             if (err) return console.log("The API returned an error: " + err)
             const events = res.data.items
             if (events.length) {
-                console.log("Upcoming 10 events:")
+                // console.log(events)
+                // console.log("Upcoming 10 events:")
                 events.map((event, i) => {
-                    const start = event.start.dateTime || event.start.date
-                    console.log(
-                        `${start} - ${
-                            event.summary
-                        } - ${typeof event.description}`
-                    )
+                    if (event.organizer.email === "jalexander@2u.com") return
+                    if (!event.description.includes("Tutorial Session")) return
+                    event.attendees.forEach((attendee) => {
+                        if (!attendee.organizer) {
+                            console.log(attendee.email)
+                        }
+                    })
+                    // const start = event.start.dateTime || event.start.date
+                    // let values = Object.values(seen)
+                    // if (!values.includes(event.id)) {
+                    //     console.log(`${i + 1} unique!`)
+                    //     seen[i] = event.id
+                    // } else {
+                    //     console.log(`${i + 1} not unique!`)
+                    // }
                 })
+                // console.log(seen)
             } else {
                 console.log("No upcoming events found.")
             }

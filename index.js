@@ -1,6 +1,11 @@
 const fs = require("fs")
 const readline = require("readline")
 const { google } = require("googleapis")
+const util = require("util")
+const { parse } = require("path")
+
+const readFileAsync = util.promisify(fs.readFile)
+const writeFileAsync = util.promisify(fs.writeFile)
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
@@ -83,33 +88,41 @@ function listEvents(auth) {
             singleEvents: true,
             orderBy: "startTime",
         },
-        (err, res) => {
-            if (err) return console.log("The API returned an error: " + err)
-            const events = res.data.items
-            if (events.length) {
-                // console.log(events)
-                // console.log("Upcoming 10 events:")
-                events.map((event, i) => {
-                    if (event.organizer.email === "jalexander@2u.com") return
-                    if (!event.description.includes("Tutorial Session")) return
-                    event.attendees.forEach((attendee) => {
-                        if (!attendee.organizer) {
-                            console.log(attendee.email)
-                        }
-                    })
-                    // const start = event.start.dateTime || event.start.date
-                    // let values = Object.values(seen)
-                    // if (!values.includes(event.id)) {
-                    //     console.log(`${i + 1} unique!`)
-                    //     seen[i] = event.id
-                    // } else {
-                    //     console.log(`${i + 1} not unique!`)
-                    // }
-                })
-                // console.log(seen)
-            } else {
-                console.log("No upcoming events found.")
-            }
-        }
+        apiResponse
     )
+}
+
+const apiResponse = (err, res) => {
+    if (err) return console.log("The API returned an error: " + err)
+    const events = res.data.items
+    if (events.length) {
+        parseResponse(events)
+    }
+}
+
+async function parseResponse(events) {
+    const fileStr = await readFileAsync("emails.json", "utf8")
+
+    let emails = JSON.parse(fileStr)
+    events.map((event, i) => parseAttendee(event, i, emails))
+}
+
+const parseAttendee = (event, i, emails) => {
+    if (event.organizer.email === "jalexander@2u.com") return
+    if (!event.description.includes("Tutorial Session")) return
+    event.attendees.forEach((attendee) => parseEmail(attendee, event, emails))
+}
+
+const parseEmail = (attendee, event, emails) => {
+    if (attendee.organizer) return
+    if (!emails.includes(attendee.email)) {
+        //change this
+        emails.push({
+            email: attendee.email,
+            date: event.start.dateTime,
+        })
+        console.log("Pushed email!")
+    } else {
+        console.log("Email already in file!")
+    }
 }

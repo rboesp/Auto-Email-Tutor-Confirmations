@@ -92,43 +92,49 @@ function listEvents(auth) {
     )
 }
 
-const handleResponse = (err, res) => {
+const handleResponse = async (err, res) => {
     if (err) return console.log("The API returned an error: " + err)
     const events = res.data.items
     if (!events.length) return console.log("No Events!")
-    parseEvents(events)
-}
-
-async function parseEvents(events) {
     const fileStr = await readFileAsync("emails.json", "utf8")
     let emails = JSON.parse(fileStr)
-    let attendees = []
+    let sessions = getTutoringSessionsFromEvents(events)
+    console.log(sessions) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
+}
+
+// function parseEventsForAttendees(events) {
+//     let attendees =
+//     return attendees
+// }
+
+const getTutoringSessionsFromEvents = (events) => {
+    let sessions = []
     events.map((event) => {
-        let validEvent = getValidEvent(event)
-        if (validEvent) {
-            let attendee = getAttendee(validEvent)
-            attendees.push(attendee)
-            // console.log(attendee)
-        }
+        if (event.organizer.email === "jalexander@2u.com") return
+        if (!event.description.includes("Tutorial Session")) return
+        let session = getSessionProperties(event)
+        sessions.push(session)
     })
-    console.log(attendees) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
+    return sessions
 }
 
-const getValidEvent = (event) => {
-    if (event.organizer.email === "jalexander@2u.com") return
-    if (!event.description.includes("Tutorial Session")) return
-    return event
-}
-
-const getAttendee = (validEvent) => {
-    let a
+//here get other properties if needed
+const getSessionProperties = (validEvent) => {
+    // console.log(validEvent) //its in here
+    //***one idea, just take the properties you need, and pass them into the return data  */
+    let student
+    const session_time = validEvent.start.dateTime
+    const event_id = validEvent.id
+    // console.log(time)
     validEvent.attendees.forEach((attendee) => {
-        a = parseOrganizer(attendee)
+        student = parseAttendees(attendee)
     })
-    return a
+    // console.log(a)
+    return [event_id, session_time, student]
 }
 
-const parseOrganizer = (attendee) => {
+const parseAttendees = (attendee) => {
+    // console.log(attendee)
     if (!attendee.organizer) {
         // console.log(attendee)
         return attendee

@@ -92,6 +92,11 @@ function listEvents(auth) {
     )
 }
 
+/**
+ * Handles incoming response from google API request
+ * @param {res}
+ * @param {err}
+ */
 const handleResponse = async (err, res) => {
     if (err) return console.log("The API returned an error: " + err)
     const events = res.data.items
@@ -102,11 +107,11 @@ const handleResponse = async (err, res) => {
     console.log(sessions) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
 }
 
-// function parseEventsForAttendees(events) {
-//     let attendees =
-//     return attendees
-// }
-
+/**
+ * Filters for tutoring session from other calandar events
+ * @param {events} array[Object] Represents next 20 events in my google calendar
+ * @returns {array[Object]}
+ */
 const getTutoringSessionsFromEvents = (events) => {
     let sessions = []
     events.map((event) => {
@@ -118,26 +123,34 @@ const getTutoringSessionsFromEvents = (events) => {
     return sessions
 }
 
-//here get other properties if needed
+/**
+ * Gets the useful properties needed to make an email to student from tutoring event
+ * @param {validEvent} Object A tutoring session the has been made through calendly
+ * and retrieved through api call from google calendar above
+ * @returns {array}
+ */
 const getSessionProperties = (validEvent) => {
-    // console.log(validEvent) //its in here
-    //***one idea, just take the properties you need, and pass them into the return data  */
     let student
     const session_time = validEvent.start.dateTime
     const event_id = validEvent.id
     // console.log(time)
     validEvent.attendees.forEach((attendee) => {
-        student = parseAttendees(attendee)
+        student = getStudent(attendee)
     })
     // console.log(a)
     return [event_id, session_time, student]
 }
 
-const parseAttendees = (attendee) => {
+/**
+ * Parses student from myself in attendees
+ * @param {attendees} array[Object]
+ * @returns {Object}
+ */
+const getStudent = (attendees) => {
     // console.log(attendee)
-    if (!attendee.organizer) {
+    if (!attendees.organizer) {
         // console.log(attendee)
-        return attendee
+        return attendees
     }
 }
 

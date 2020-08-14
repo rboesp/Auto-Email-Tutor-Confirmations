@@ -88,41 +88,60 @@ function listEvents(auth) {
             singleEvents: true,
             orderBy: "startTime",
         },
-        apiResponse
+        handleResponse
     )
 }
 
-const apiResponse = (err, res) => {
+const handleResponse = (err, res) => {
     if (err) return console.log("The API returned an error: " + err)
     const events = res.data.items
-    if (events.length) {
-        parseResponse(events)
-    }
+    if (!events.length) return console.log("No Events!")
+    parseEvents(events)
 }
 
-async function parseResponse(events) {
+async function parseEvents(events) {
     const fileStr = await readFileAsync("emails.json", "utf8")
-
     let emails = JSON.parse(fileStr)
-    events.map((event, i) => parseAttendee(event, i, emails))
+    let attendees = []
+    events.map((event) => {
+        let validEvent = getValidEvent(event)
+        if (validEvent) {
+            let attendee = getAttendee(validEvent)
+            attendees.push(attendee)
+            // console.log(attendee)
+        }
+    })
+    console.log(attendees) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
 }
 
-const parseAttendee = (event, i, emails) => {
+const getValidEvent = (event) => {
     if (event.organizer.email === "jalexander@2u.com") return
     if (!event.description.includes("Tutorial Session")) return
-    event.attendees.forEach((attendee) => parseEmail(attendee, event, emails))
+    return event
 }
 
-const parseEmail = (attendee, event, emails) => {
-    if (attendee.organizer) return
-    if (!emails.includes(attendee.email)) {
-        //change this
-        emails.push({
-            email: attendee.email,
-            date: event.start.dateTime,
-        })
-        console.log("Pushed email!")
-    } else {
-        console.log("Email already in file!")
+const getAttendee = (validEvent) => {
+    let a
+    validEvent.attendees.forEach((attendee) => {
+        a = parseOrganizer(attendee)
+    })
+    return a
+}
+
+const parseOrganizer = (attendee) => {
+    if (!attendee.organizer) {
+        // console.log(attendee)
+        return attendee
     }
 }
+
+// // console.log(attendee.email)
+// if (!emails.includes(attendee.email)) {
+//     emails.push({
+//         email: attendee.email,
+//         date: event.start.dateTime,
+//     })
+//     console.log("Pushed email!")
+// } else {
+//     console.log("Email already in file!")
+// }

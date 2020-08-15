@@ -35,7 +35,10 @@ async function start() {
     //if any upcoming sessions not in sent sessions
     let to_send = []
     upcoming_sessions.map((session) => {
-        console.log(session.id)
+        console.log(
+            session.id,
+            diff_hours(new Date(), new Date(session.data.startTime)) / 24
+        )
         if (!sent_ids.includes(session.id)) {
             console.log("File ready to send!")
             to_send.push(session)
@@ -48,3 +51,9 @@ async function start() {
 }
 
 start()
+
+function diff_hours(dt2, dt1) {
+    var diff = (dt2.getTime() - dt1.getTime()) / 1000
+    diff /= 60 * 60
+    return Math.abs(Math.round(diff))
+}

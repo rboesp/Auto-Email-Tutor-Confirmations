@@ -7,6 +7,32 @@ const { parse } = require("path")
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
+class Data {
+    constructor(email, name, startTime) {
+        this.email = email
+        this.name = name
+        this.startTime = startTime
+    }
+}
+
+class Session {
+    constructor(id, email, name, startTime) {
+        this.id = id
+        this.data = new Data(email, name, startTime)
+    }
+}
+
+class SavedSessionList {
+    constructor(list = []) {
+        this.saved_sesssions = {}
+        list.forEach((item) => {
+            this.saved_sesssions[item.id] = item.data
+        })
+        // console.log("****SAVED SESSIONS LIST ******")
+        // console.log(this.saved_sesssions)
+    }
+}
+
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 // The file token.json stores the user's access and refresh tokens, and is
@@ -102,9 +128,30 @@ const handleResponse = async (err, res) => {
     const events = res.data.items
     if (!events.length) return console.log("No Events!")
     const fileStr = await readFileAsync("savedSessions.json", "utf8")
-    let savedSessions = JSON.parse(fileStr)
+    let savedSessions
+    try {
+        if (fileStr) savedSessions = JSON.parse(fileStr)
+    } catch (err) {
+        throw new Error("File parse failed")
+    }
     let calendar_sessions = getTutoringSessionsFromEvents(events)
-    console.log(calendar_sessions) //now you can check if different than file *THINK ABOUT WHAT DATA STRUCTURES YOU WANT TO USE TO MODEL DATA*
+    let sessionList = new SavedSessionList(savedSessions)
+    checkForNewSessions(sessionList, calendar_sessions)
+}
+
+const checkForNewSessions = async (sessionList, calendar_sessions) => {
+    for (let i = 0; i < calendar_sessions.length; i++) {
+        if (sessionList.saved_sesssions[`${calendar_sessions[i].id}`]) {
+            console.log("Session already saved!")
+        } else {
+            console.log("Found new session!")
+            await writeFileAsync(
+                "savedSessions.json",
+                JSON.stringify(calendar_sessions)
+            )
+            i = calendar_sessions.length
+        }
+    }
 }
 
 /**
@@ -138,7 +185,8 @@ const getSessionProperties = (validEvent) => {
         student = getStudent(attendee)
     })
     // console.log(a)
-    return [event_id, session_time, student]
+    const session = new Session(event_id, student.email, "name", session_time)
+    return session
 }
 
 /**

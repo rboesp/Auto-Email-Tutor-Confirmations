@@ -34,5 +34,4 @@ function runScript(script) {
 runScript("sessions_service.js")
 runScript("email_controller.js")
 
-console.log("Poop")
 // setInterval(() => runScript("index.js"), 60000)

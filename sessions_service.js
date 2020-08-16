@@ -127,7 +127,7 @@ const handleResponse = async (err, res) => {
     if (err) return console.log("The API returned an error: " + err)
     const events = res.data.items
     if (!events.length) return console.log("No Events!")
-    const fileStr = await readFileAsync("upcoming_sessions.json", "utf8")
+    const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
     let savedSessions
     try {
         if (fileStr) savedSessions = JSON.parse(fileStr)
@@ -146,7 +146,7 @@ const checkForNewSessions = async (sessionList, calendar_sessions) => {
         } else {
             console.log("Found new session!")
             await writeFileAsync(
-                "upcoming_sessions.json",
+                "store/upcoming_sessions.json",
                 JSON.stringify(calendar_sessions)
             )
             i = calendar_sessions.length
@@ -201,14 +201,3 @@ const getStudent = (attendees) => {
         return attendees
     }
 }
-
-// // console.log(attendee.email)
-// if (!emails.includes(attendee.email)) {
-//     emails.push({
-//         email: attendee.email,
-//         date: event.start.dateTime,
-//     })
-//     console.log("Pushed email!")
-// } else {
-//     console.log("Email already in file!")
-// }

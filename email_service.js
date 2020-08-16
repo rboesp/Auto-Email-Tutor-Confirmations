@@ -18,7 +18,7 @@ let transporter = nodemailer.createTransport({
 })
 
 async function start() {
-    const fileStr = await readFileAsync("sessions_to_send.json", "utf8")
+    const fileStr = await readFileAsync("store/sessions_to_send.json", "utf8")
     let toSend_sessions = []
     try {
         if (fileStr) toSend_sessions = JSON.parse(fileStr)
@@ -29,7 +29,7 @@ async function start() {
     if (!toSend_sessions.length)
         return console.log("No sessions to send email to!")
 
-    const sentFileStr = await readFileAsync("sent_sessions.json", "utf8")
+    const sentFileStr = await readFileAsync("store/sent_sessions.json", "utf8")
     let sent_sessions = []
     try {
         if (sentFileStr) sent_sessions = JSON.parse(sentFileStr)
@@ -39,8 +39,8 @@ async function start() {
 
     sendSessions(toSend_sessions, sent_sessions).then(async (res) => {
         // console.log(res)
-        await writeFileAsync("sessions_to_send.json", JSON.stringify([]))
-        await writeFileAsync("sent_sessions.json", JSON.stringify(res))
+        await writeFileAsync("store/sessions_to_send.json", JSON.stringify([]))
+        await writeFileAsync("store/sent_sessions.json", JSON.stringify(res))
     })
 }
 

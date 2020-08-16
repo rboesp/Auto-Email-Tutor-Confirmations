@@ -7,7 +7,7 @@ const writeFileAsync = util.promisify(fs.writeFile)
 const time_frame = 3
 
 async function start() {
-    const fileStr = await readFileAsync("upcoming_sessions.json", "utf8")
+    const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
     let upcoming_sessions = []
     try {
         if (fileStr) upcoming_sessions = JSON.parse(fileStr)
@@ -16,7 +16,7 @@ async function start() {
     }
     // console.log(upcoming_sessions)
 
-    const sentFileStr = await readFileAsync("sent_sessions.json", "utf8")
+    const sentFileStr = await readFileAsync("store/sent_sessions.json", "utf8")
     let sent_sessions = []
     try {
         if (sentFileStr) sent_sessions = JSON.parse(sentFileStr)
@@ -48,7 +48,7 @@ async function start() {
     })
 
     // console.log(to_send)
-    await writeFileAsync("sessions_to_send.json", JSON.stringify(to_send))
+    await writeFileAsync("store/sessions_to_send.json", JSON.stringify(to_send))
     console.log("Put upcoming sessions in to-send file!")
 }
 

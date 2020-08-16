@@ -4,6 +4,8 @@ const util = require("util")
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
+const time_frame = 3
+
 async function start() {
     const fileStr = await readFileAsync("upcoming_sessions.json", "utf8")
     let upcoming_sessions = []
@@ -35,14 +37,14 @@ async function start() {
     //if any upcoming sessions not in sent sessions
     let to_send = []
     upcoming_sessions.map((session) => {
-        console.log(
-            session.id,
-            diff_hours(new Date(), new Date(session.data.startTime)) / 24
-        )
+        let time = diff_hours(new Date(), new Date(session.data.startTime)) / 24
         if (!sent_ids.includes(session.id)) {
-            console.log("File ready to send!")
-            to_send.push(session)
-        } else console.log("Seen it!")
+            if (time < time_frame) {
+                console.log(`Within ${time_frame}`)
+                console.log("Putting session in to send file!")
+                to_send.push(session)
+            }
+        } else console.log("Already sent reminder email!")
     })
 
     // console.log(to_send)

@@ -53,8 +53,7 @@ function sendSessions(toSend_sessions, sent_sessions) {
                 .then((res) => {
                     console.log(`Sent email to ${session.data.email}`)
                     sent_sessions.push(session)
-                    // console.log(sent_sessions)
-                    if (sent_sessions.length === 2) {
+                    if (sent_sessions.length === toSend_sessions.length) {
                         resolve(sent_sessions)
                     }
                 })

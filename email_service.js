@@ -1,6 +1,6 @@
 const fs = require("fs")
 const util = require("util")
-
+require("dotenv").config()
 const nodemailer = require("nodemailer")
 
 const readFileAsync = util.promisify(fs.readFile)
@@ -36,21 +36,52 @@ async function start() {
     } catch (err) {
         throw new Error("File parse failed")
     }
-    // if (sent_sessions) console.log(sent_sessions)
-    // else console.log("No sent sessions")
 
-    // console.log(toSend_sessions)
-    toSend_sessions.forEach((session) => {
-        console.log(
-            `Sending email to ${session.data.email} at ${session.data.startTime}`
-        )
-        sent_sessions.push(session)
+    sendSessions(toSend_sessions, sent_sessions).then(async (res) => {
+        // console.log(res)
+        await writeFileAsync("sessions_to_send.json", JSON.stringify([]))
+        await writeFileAsync("sent_sessions.json", JSON.stringify(res))
     })
-
-    // console.log(sent_sessions)
-    await writeFileAsync("sent_sessions.json", JSON.stringify(sent_sessions))
-    await writeFileAsync("sessions_to_send.json", "") //change this <- not necessarily
-    console.log("Sent all sessions!")
 }
 
 start()
+
+function sendSessions(toSend_sessions, sent_sessions) {
+    return new Promise((resolve, reject) => {
+        toSend_sessions.forEach(async (session, i) => {
+            writeEmail(session.data.email, session.data.startTime)
+                .then((res) => {
+                    console.log(`Sent email to ${session.data.email}`)
+                    sent_sessions.push(session)
+                    // console.log(sent_sessions)
+                    if (sent_sessions.length === 2) {
+                        resolve(sent_sessions)
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                    reject()
+                })
+        })
+    })
+}
+
+const writeEmail = (email, time) => {
+    return new Promise((resolve, err) => {
+        let mailOptions = {
+            from: "rboesp@gmail.com",
+            to: "rboesp@gmail.com",
+            subject: `Send email to ${email}`,
+            text: `This is coming up at ${time}`,
+        }
+
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                err(error)
+            } else {
+                console.log("Email sent: " + info.response)
+                resolve()
+            }
+        })
+    })
+}

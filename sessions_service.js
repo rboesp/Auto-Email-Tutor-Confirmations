@@ -136,15 +136,16 @@ const handleResponse = async (err, res) => {
     }
     let calendar_sessions = getTutoringSessionsFromEvents(events)
     let sessionList = new SavedSessionList(savedSessions)
+    // console.log(sessionList)
     checkForNewSessions(sessionList, calendar_sessions)
 }
 
 const checkForNewSessions = async (sessionList, calendar_sessions) => {
     for (let i = 0; i < calendar_sessions.length; i++) {
         if (sessionList.saved_sesssions[`${calendar_sessions[i].id}`]) {
-            console.log("Session already saved!")
+            console.log("Session already in email queue!")
         } else {
-            console.log("Found new session!")
+            console.log("Found new sessions to put in email queue!")
             await writeFileAsync(
                 "store/upcoming_sessions.json",
                 JSON.stringify(calendar_sessions)
@@ -165,6 +166,7 @@ const getTutoringSessionsFromEvents = (events) => {
         if (event.organizer.email === "jalexander@2u.com") return
         if (!event.description.includes("Tutorial Session")) return
         let session = getSessionProperties(event)
+        if (!session) return
         sessions.push(session)
     })
     return sessions
@@ -177,6 +179,12 @@ const getTutoringSessionsFromEvents = (events) => {
  * @returns {array}
  */
 const getSessionProperties = (validEvent) => {
+    let student_name = validEvent.summary.split(" and ")[0]
+    if (!student_name.split("Canceled: ")[0]) {
+        return
+    }
+    student_name = student_name.split(" ")[0] //get first name
+    // console.log(student_name)
     let student
     const session_time = validEvent.start.dateTime
     const event_id = validEvent.id
@@ -185,7 +193,12 @@ const getSessionProperties = (validEvent) => {
         student = getStudent(attendee)
     })
     // console.log(a)
-    const session = new Session(event_id, student.email, "name", session_time)
+    const session = new Session(
+        event_id,
+        student.email,
+        student_name,
+        session_time
+    )
     return session
 }
 

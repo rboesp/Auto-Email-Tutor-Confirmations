@@ -2,6 +2,7 @@ const fs = require("fs")
 const util = require("util")
 require("dotenv").config()
 const nodemailer = require("nodemailer")
+const e = require("./email_text")
 
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
@@ -37,23 +38,33 @@ async function start() {
         throw new Error("File parse failed")
     }
 
-    sendSessions(toSend_sessions, sent_sessions).then(async (res) => {
-        // console.log(res)
-        await writeFileAsync("store/sessions_to_send.json", JSON.stringify([]))
-        await writeFileAsync("store/sent_sessions.json", JSON.stringify(res))
-    })
+    sendConfirmationEmails(toSend_sessions, sent_sessions).then(
+        async (sent_sessions) => {
+            await writeFileAsync(
+                "store/sessions_to_send.json",
+                JSON.stringify([])
+            )
+            await writeFileAsync(
+                "store/sent_sessions.json",
+                JSON.stringify(sent_sessions)
+            )
+        }
+    )
 }
 
-start()
-
-function sendSessions(toSend_sessions, sent_sessions) {
+function sendConfirmationEmails(sessions_to_send, sent_sessions) {
     return new Promise((resolve, reject) => {
-        toSend_sessions.forEach(async (session, i) => {
-            writeEmail(session.data.email, session.data.startTime)
+        sessions_to_send.forEach(async (session, i) => {
+            console.log(session)
+            writeEmail(
+                session.data.email,
+                session.data.name,
+                session.data.startTime
+            )
                 .then((res) => {
                     console.log(`Sent email to ${session.data.email}`)
                     sent_sessions.push(session)
-                    if (sent_sessions.length === toSend_sessions.length) {
+                    if (sent_sessions.length === sessions_to_send.length) {
                         resolve(sent_sessions)
                     }
                 })
@@ -65,13 +76,19 @@ function sendSessions(toSend_sessions, sent_sessions) {
     })
 }
 
-const writeEmail = (email, time) => {
+const writeEmail = (email, name, time) => {
     return new Promise((resolve, err) => {
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: "rboesp@gmail.com",
-            subject: `Send email to ${email}`,
-            text: `This is coming up at ${time}`,
+            cc: "rboesp@gmail.com",
+            subject: `Confirmation for ${name}`,
+            text: e.email_body(
+                name,
+                time,
+                "https://us04web.zoom.us/j/79938221437?pwd=dksrN3dtOVduQ1JSbVpuV3M4Q0dzZz09",
+                "6HUuS2"
+            ),
         }
 
         transporter.sendMail(mailOptions, function (error, info) {
@@ -84,3 +101,6 @@ const writeEmail = (email, time) => {
         })
     })
 }
+
+/*ENTRY POINT*/
+start()

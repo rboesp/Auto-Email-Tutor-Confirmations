@@ -37,6 +37,7 @@ async function start() {
     //if any upcoming sessions not in sent sessions
     let to_send = []
     upcoming_sessions.map((session) => {
+        console.log(session)
         let time = diff_hours(new Date(), new Date(session.data.startTime)) / 24
         if (!sent_ids.includes(session.id)) {
             if (time < time_frame) {

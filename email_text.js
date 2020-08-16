@@ -1,5 +1,5 @@
 function email_body(name, time, session_zoom_link, zoom_link_password) {
-    // console.log(name, time)
+    // console.log(name, time.split("T"))
     return `
 Hi ${name}!
 

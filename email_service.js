@@ -77,12 +77,20 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
 }
 
 const writeEmail = (email, name, time) => {
+    time = formatDate(time)
+    let date = time.split("T")[0]
+    time = time.split("T")[1].split("-")[0]
+    date = date.split("-")
+    date = date[1] + "/" + date[2]
+    console.log(time)
+    console.log(date)
+
     return new Promise((resolve, err) => {
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: "rboesp@gmail.com",
             cc: "rboesp@gmail.com",
-            subject: `Confirmation for ${name}`,
+            subject: `Coding Boot Camp - Tutor Confirmation - ${date} ${time} PST`,
             text: e.email_body(
                 name,
                 time,
@@ -104,3 +112,35 @@ const writeEmail = (email, name, time) => {
 
 /*ENTRY POINT*/
 start()
+
+//from https://stackoverflow.com/questions/4898574/converting-24-hour-time-to-12-hour-time-w-am-pm-using-javascript
+function formatDate(date) {
+    var d = new Date(date)
+    var hh = d.getHours()
+    var m = d.getMinutes()
+    var s = d.getSeconds()
+    var dd = "AM"
+    var h = hh
+    if (h >= 12) {
+        h = hh - 12
+        dd = "PM"
+    }
+    if (h == 0) {
+        h = 12
+    }
+    m = m < 10 ? "0" + m : m
+
+    s = s < 10 ? "0" + s : s
+
+    /* if you want 2 digit hours:
+    h = h<10?"0"+h:h; */
+
+    var pattern = new RegExp("0?" + hh + ":" + m + ":" + s)
+
+    var replacement = h + ":" + m
+    /* if you want to add seconds
+    replacement += ":"+s;  */
+    replacement += " " + dd
+
+    return date.replace(pattern, replacement)
+}

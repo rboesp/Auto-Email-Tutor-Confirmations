@@ -1,8 +1,21 @@
 const fs = require("fs")
 const util = require("util")
 
+const nodemailer = require("nodemailer")
+
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
+
+let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "rboesp@gmail.com",
+        pass: process.env.GMAIL_PASSWORD,
+    },
+    tls: {
+        rejectUnauthorized: false,
+    },
+})
 
 async function start() {
     const fileStr = await readFileAsync("sessions_to_send.json", "utf8")
@@ -36,7 +49,7 @@ async function start() {
 
     // console.log(sent_sessions)
     await writeFileAsync("sent_sessions.json", JSON.stringify(sent_sessions))
-    await writeFileAsync("sessions_to_send.json", "") //change this
+    await writeFileAsync("sessions_to_send.json", "") //change this <- not necessarily
     console.log("Sent all sessions!")
 }
 

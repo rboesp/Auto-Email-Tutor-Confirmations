@@ -46,4 +46,4 @@ function go() {
     })
 }
 
-setInterval(() => go(), 60000*60)
+setInterval(() => go(), 60000)

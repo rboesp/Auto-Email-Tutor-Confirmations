@@ -88,7 +88,7 @@ const writeEmail = (email, name, time) => {
     return new Promise((resolve, err) => {
         let mailOptions = {
             from: "rboesp@gmail.com",
-            to: `${email}`,
+            to: `rboesp@gmail.com`,
             cc: "rboesp@gmail.com",
             subject: `Coding Boot Camp - Tutor Confirmation - ${date} ${time} PST`,
             text: e.email_body(

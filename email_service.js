@@ -78,18 +78,31 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
     })
 }
 
-const writeEmail = (email, name, time) => {
-    let time2 = formatDate(time)
-    let time3 = time2
-    let date = time3.split("T")[0]
-    let send_time = time2.split("T")[1].split("-")[0]
-    date = date.split("-")
-    date = date[1] + "/" + date[2]
-    console.log(send_time)
-    console.log(date)
+function getDate(time) {
+    return new Promise((resolve, reject) => {
+        let date = time.split("T")[0]
+        date = date.split("-")
+        date = date[1] + "/" + date[2]
+        if (!date) reject("Err with date")
+        resolve(date)
+    })
+}
+
+function formatTime(time) {
+    return new Promise((resolve, reject) => {
+        time = formatDate(time)
+        time = time.split("T")[1].split("-")[0]
+        if (!time) reject("Err with time")
+        resolve(time)
+    })
+}
+
+const writeEmail = async (email, name, time) => {
+    const send_time = await formatTime(time)
+    const date = await getDate(formatDate(time))
 
     return new Promise((resolve, err) => {
-        console.log(time)
+        console.log(date)
         console.log(send_time)
         let mailOptions = {
             from: "rboesp@gmail.com",

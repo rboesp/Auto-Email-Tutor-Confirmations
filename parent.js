@@ -1,5 +1,7 @@
 const childProcess = require("child_process")
 const fs = require("fs")
+const app = express()
+const port = process.env.PORT || 3000
 
 function run(scriptPath, callback) {
     // keep track of whether callback has been invoked to prevent multiple invocations
@@ -45,4 +47,9 @@ function go() {
     })
 }
 
-setInterval(() => go(), 60000)
+app.listen(port, () => {
+    console.log(
+        `Automatic email reminder app listening at http://localhost:${port}`
+    )
+    setInterval(() => go(), 60000)
+})

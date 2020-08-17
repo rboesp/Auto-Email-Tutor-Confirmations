@@ -53,5 +53,5 @@ app.listen(port, () => {
     console.log(
         `Automatic email reminder app listening at http://localhost:${port}`
     )
-    setInterval(() => go(), 60000)
+    setInterval(() => go(), 10)
 })

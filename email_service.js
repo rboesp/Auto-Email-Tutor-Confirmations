@@ -119,11 +119,11 @@ function formatDate(date) {
     var hh = d.getHours()
     var m = d.getMinutes()
     var s = d.getSeconds()
-    var dd = "am"
+    var dd = "AM"
     var h = hh
     if (h >= 12) {
         h = hh - 12
-        dd = "pm"
+        dd = "PM"
     }
     if (h == 0) {
         h = 12

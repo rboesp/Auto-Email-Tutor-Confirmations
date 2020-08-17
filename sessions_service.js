@@ -24,9 +24,9 @@ class Session {
 
 class SavedSessionList {
     constructor(list = []) {
-        this.saved_sesssions = {}
+        this.saved_sessions = {}
         list.forEach((item) => {
-            this.saved_sesssions[item.id] = item.data
+            this.saved_sessions[item.id] = item.data
         })
         // console.log("****SAVED SESSIONS LIST ******")
         // console.log(this.saved_sesssions)
@@ -124,12 +124,15 @@ function listEvents(auth) {
  * @param {err}
  */
 const handleResponse = async (err, res) => {
-    if (err) return console.log("The API returned an error: " + err)
+    if (err) return console.log("**** ---> The API returned an error: " + err)
     const events = res.data.items
     if (!events.length) return console.log("No Events!")
-    const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
     let savedSessions
     try {
+        const fileStr = await readFileAsync(
+            "store/upcoming_sessions.json",
+            "utf8"
+        )
         if (fileStr) savedSessions = JSON.parse(fileStr)
     } catch (err) {
         throw new Error("File parse failed")
@@ -142,9 +145,10 @@ const handleResponse = async (err, res) => {
 
 const checkForNewSessions = async (sessionList, calendar_sessions) => {
     for (let i = 0; i < calendar_sessions.length; i++) {
-        if (sessionList.saved_sesssions[`${calendar_sessions[i].id}`]) {
-            console.log("Session already in email queue!")
-        } else {
+        const idSavedAlready =
+            sessionList.saved_sessions[`${calendar_sessions[i].id}`]
+        if (!idSavedAlready) {
+            //finding a new session not saved before
             console.log("Found new sessions to put in email queue!")
             await writeFileAsync(
                 "store/upcoming_sessions.json",
@@ -163,12 +167,13 @@ const checkForNewSessions = async (sessionList, calendar_sessions) => {
 const getTutoringSessionsFromEvents = (events) => {
     let sessions = []
     events.map((event) => {
-        if (event.organizer.email === "jalexander@2u.com") return
+        if (event.organizer.email === "jalexander@2u.com") return //don't think I need this
         if (!event.description.includes("Tutorial Session")) return
         let session = getSessionProperties(event)
         if (!session) return
         sessions.push(session)
     })
+    // console.log(sessions)
     return sessions
 }
 
@@ -179,20 +184,27 @@ const getTutoringSessionsFromEvents = (events) => {
  * @returns {array}
  */
 const getSessionProperties = (validEvent) => {
+    // console.log(validEvent.attendees)
+    // console.log(time)
     let student_name = validEvent.summary.split(" and ")[0]
     if (!student_name.split("Canceled: ")[0]) {
-        return
+        return //skip this session
     }
     student_name = student_name.split(" ")[0] //get first name
     // console.log(student_name)
-    let student
+
+    let student //find way to re-do this and make it const
+    validEvent.attendees.forEach((attendee) => {
+        student = filterStudentFromAttendees(attendee)
+    })
+
+    if (!student) {
+        return //either no attendees or only myself, skip this session
+    }
+
     const session_time = validEvent.start.dateTime
     const event_id = validEvent.id
-    // console.log(time)
-    validEvent.attendees.forEach((attendee) => {
-        student = getStudent(attendee)
-    })
-    // console.log(a)
+
     const session = new Session(
         event_id,
         student.email,
@@ -207,7 +219,7 @@ const getSessionProperties = (validEvent) => {
  * @param {attendees} array[Object]
  * @returns {Object}
  */
-const getStudent = (attendees) => {
+const filterStudentFromAttendees = (attendees) => {
     // console.log(attendee)
     if (!attendees.organizer) {
         // console.log(attendee)

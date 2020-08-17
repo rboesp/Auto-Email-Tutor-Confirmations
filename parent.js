@@ -32,18 +32,24 @@ function runScript(script) {
         // Now we can run a script and invoke a callback when complete, e.g.
         run(`./${script}`, function (err) {
             if (err) reject(err)
-            resolve(`finished running ${script} \n`)
+            resolve(`FINISHED RUNNING ${script} \n`)
         })
     })
 }
 
+function log(msg) {
+    console.log(`----> ${msg} `)
+}
+
 function go() {
+    console.log("----> Starting confirmation service!!")
     runScript("sessions_service.js").then((msg) => {
-        console.log(msg)
+        log(msg)
         runScript("email_controller.js").then((msg) => {
-            console.log(msg)
+            log(msg)
             runScript("email_service.js").then((msg) => {
-                console.log(msg)
+                log(msg)
+                console.log("\n******Waiting for next api poll...*******")
             })
         })
     })
@@ -53,5 +59,6 @@ app.listen(port, () => {
     console.log(
         `Automatic email reminder listening at http://localhost:${port}`
     )
-    setInterval(() => go(), 10000)
+    go()
+    setInterval(() => go(), 60000 * 30)
 })

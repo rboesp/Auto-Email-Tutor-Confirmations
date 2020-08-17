@@ -1,0 +1,27 @@
+{
+  "name": "google-calendar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "sessions_service.js",
+  "dependencies": {
+    "child-process": "^1.0.2",
+    "dotenv": "^8.2.0",
+    "googleapis": "^39.2.0",
+    "nodemon": "^2.0.4",
+    "nodemailer": "^6.4.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rboesp/automated_email_confirmations.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rboesp/automated_email_confirmations/issues"
+  },
+  "homepage": "https://github.com/rboesp/automated_email_confirmations#readme"
+}

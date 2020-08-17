@@ -77,23 +77,26 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
 }
 
 const writeEmail = (email, name, time) => {
-    time = formatDate(time)
-    let date = time.split("T")[0]
-    time = time.split("T")[1].split("-")[0]
+    let time2 = formatDate(time)
+    let time3 = time2
+    let date = time3.split("T")[0]
+    let send_time = time2.split("T")[1].split("-")[0]
     date = date.split("-")
     date = date[1] + "/" + date[2]
-    console.log(time)
+    console.log(send_time)
     console.log(date)
 
     return new Promise((resolve, err) => {
+        console.log(time)
+        console.log(send_time)
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: `rboesp@gmail.com`,
             cc: "rboesp@gmail.com",
-            subject: `Coding Boot Camp - Tutor Confirmation - ${date} ${time} PST`,
+            subject: `Coding Boot Camp - Tutor Confirmation - ${date} ${send_time} PST`,
             text: e.email_body(
                 name,
-                time,
+                send_time,
                 "https://us04web.zoom.us/j/79938221437?pwd=dksrN3dtOVduQ1JSbVpuV3M4Q0dzZz09",
                 "6HUuS2"
             ),

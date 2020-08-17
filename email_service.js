@@ -88,7 +88,7 @@ const writeEmail = (email, name, time) => {
     return new Promise((resolve, err) => {
         let mailOptions = {
             from: "rboesp@gmail.com",
-            to: "rboesp@gmail.com",
+            to: `${email}`,
             cc: "rboesp@gmail.com",
             subject: `Coding Boot Camp - Tutor Confirmation - ${date} ${time} PST`,
             text: e.email_body(
@@ -119,11 +119,11 @@ function formatDate(date) {
     var hh = d.getHours()
     var m = d.getMinutes()
     var s = d.getSeconds()
-    var dd = "AM"
+    var dd = "am"
     var h = hh
     if (h >= 12) {
         h = hh - 12
-        dd = "PM"
+        dd = "pm"
     }
     if (h == 0) {
         h = 12

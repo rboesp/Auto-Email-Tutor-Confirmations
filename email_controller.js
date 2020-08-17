@@ -4,7 +4,13 @@ const util = require("util")
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
-const time_frame = 3
+const time_frame = 72
+
+function diff_hours(dt2, dt1) {
+    var diff = (dt2.getTime() - dt1.getTime()) / 1000
+    diff /= 60 * 60
+    return Math.abs(Math.round(diff))
+}
 
 async function start() {
     const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
@@ -32,31 +38,23 @@ async function start() {
         sent_ids.push(session.id)
     })
 
-    console.log(sent_ids)
+    // console.log(sent_ids)
 
     //if any upcoming sessions not in sent sessions
     let to_send = []
     upcoming_sessions.map((session) => {
-        console.log(session)
-        let time = diff_hours(new Date(), new Date(session.data.startTime)) / 24
+        // console.log(session)
+        let time = diff_hours(new Date(), new Date(session.data.startTime))
         if (!sent_ids.includes(session.id)) {
             if (time < time_frame) {
-                console.log(`Within ${time_frame}`)
-                console.log("Putting session in to send file!")
+                console.log(`Session within ${time_frame} hours!`)
                 to_send.push(session)
             }
-        } else console.log("Already sent reminder email!")
+        } else console.log("Already sent reminder email for this session!")
     })
 
     // console.log(to_send)
     await writeFileAsync("store/sessions_to_send.json", JSON.stringify(to_send))
-    console.log("Put upcoming sessions in to-send file!")
 }
 
 start()
-
-function diff_hours(dt2, dt1) {
-    var diff = (dt2.getTime() - dt1.getTime()) / 1000
-    diff /= 60 * 60
-    return Math.abs(Math.round(diff))
-}

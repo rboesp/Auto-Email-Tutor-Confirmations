@@ -54,6 +54,7 @@ async function start() {
 
 function sendConfirmationEmails(sessions_to_send, sent_sessions) {
     return new Promise((resolve, reject) => {
+        let email_send_count = 0
         sessions_to_send.forEach(async (session, i) => {
             console.log(session)
             writeEmail(
@@ -62,9 +63,10 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
                 session.data.startTime
             )
                 .then((res) => {
+                    email_send_count++
                     console.log(`Sent email to ${session.data.email}`)
                     sent_sessions.push(session)
-                    if (sent_sessions.length === sessions_to_send.length) {
+                    if (email_send_count === sessions_to_send.length) {
                         resolve(sent_sessions)
                     }
                 })

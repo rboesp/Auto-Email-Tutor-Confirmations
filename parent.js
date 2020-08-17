@@ -24,14 +24,28 @@ function run(scriptPath, callback) {
 }
 
 function runScript(script) {
-    // Now we can run a script and invoke a callback when complete, e.g.
-    run(`./${script}`, function (err) {
-        if (err) throw err
-        console.log(`finished running ${script} \n`)
+    return new Promise((resolve, reject) => {
+        // Now we can run a script and invoke a callback when complete, e.g.
+        run(`./${script}`, function (err) {
+            if (err) reject(err)
+            resolve(`finished running ${script} \n`)
+        })
     })
 }
 
-runScript("sessions_service.js")
-runScript("email_controller.js")
+function go() {
+    runScript("sessions_service.js").then((msg) => {
+        console.log(msg)
+        runScript("sessions_service.js").then((msg) => {
+            console.log(msg)
+            runScript("email_controller.js").then((msg) => {
+                console.log(msg)
+                runScript("email_service.js").then((msg) => {
+                    console.log(msg)
+                })
+            })
+        })
+    })
+}
 
-// setInterval(() => runScript("index.js"), 60000)
+setInterval(() => go(), 60000)

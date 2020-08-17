@@ -34,13 +34,12 @@ function runScript(script) {
 }
 
 function go() {
-        runScript("sessions_service.js").then((msg) => {
+    runScript("sessions_service.js").then((msg) => {
+        console.log(msg)
+        runScript("email_controller.js").then((msg) => {
             console.log(msg)
-            runScript("email_controller.js").then((msg) => {
+            runScript("email_service.js").then((msg) => {
                 console.log(msg)
-                runScript("email_service.js").then((msg) => {
-                    console.log(msg)
-                })
             })
         })
     })

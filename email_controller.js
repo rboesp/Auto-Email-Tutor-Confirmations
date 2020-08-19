@@ -4,7 +4,7 @@ const util = require("util")
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
-const time_frame = 72
+const time_frame = 25
 
 function diff_hours(dt2, dt1) {
     var diff = (dt2.getTime() - dt1.getTime()) / 1000

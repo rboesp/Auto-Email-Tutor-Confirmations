@@ -1,21 +1,5 @@
 [
     {
-        "id": "made_up",
-        "data": {
-            "email": "jeronimo.pa@gmail.com",
-            "name": "Paul",
-            "startTime": "2020-08-18T13:00:00-07:00"
-        }
-    },
-    {
-        "id": "1n44fp5aj39eunqj0i61ouc76o",
-        "data": {
-            "email": "mathenjs@gmail.com",
-            "name": "Joel",
-            "startTime": "2020-08-18T15:00:00-07:00"
-        }
-    },
-    {
         "id": "e6sqhl4mvuh34ri27e3bs50j8c",
         "data": {
             "email": "jeffrey1choi@gmail.com",
@@ -56,14 +40,6 @@
         }
     },
     {
-        "id": "k8r0urj0ecl4032b0r9vugu600",
-        "data": {
-            "email": "rboesp@gmail.com",
-            "name": "Robert",
-            "startTime": "2020-08-20T11:00:00-07:00"
-        }
-    },
-    {
         "id": "dptmv8bjabrrj3oc65cftjtb1g",
         "data": {
             "email": "mathenjs@gmail.com",
@@ -77,6 +53,22 @@
             "email": "smsu21@hotmail.com",
             "name": "Cassandra",
             "startTime": "2020-08-21T16:00:00-07:00"
+        }
+    },
+    {
+        "id": "6p9cql53uib5igqfdr3h942tgk",
+        "data": {
+            "email": "jeremys.g.greenfield@gmail.com",
+            "name": "jeremy",
+            "startTime": "2020-08-25T15:00:00-07:00"
+        }
+    },
+    {
+        "id": "8q2528tpp3u2uv3frlile6eebo",
+        "data": {
+            "email": "smsu21@hotmail.com",
+            "name": "Cassandra",
+            "startTime": "2020-08-26T16:00:00-07:00"
         }
     }
 ]

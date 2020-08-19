@@ -15,10 +15,10 @@ Password: ${zoom_link_password}
 
 Again, all I need from you:
 
-    Be on Tutors & Students Slack 5 minutes before your time slot.
-    Make sure your computer/mic/internet connection are working.
-    Make sure your workspace is quiet and free from interruptions.
-    At the end of the session, I will provide you with a link to a 2 minute evaluation form that you are required to complete.
+    \t\u2022 Be on Tutors & Students Slack 5 minutes before your time slot.
+    \t\u2022 Make sure your computer/mic/internet connection are working.
+    \t\u2022 Make sure your workspace is quiet and free from interruptions.
+    \t\u2022 At the end of the session, I will provide you with a link to a 2 minute evaluation form that you are required to complete.
 
 
 Slack or email me with any questions. I’m looking forward to our meeting!

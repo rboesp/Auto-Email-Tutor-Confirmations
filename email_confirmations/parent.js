@@ -1,0 +1,64 @@
+const childProcess = require("child_process")
+const fs = require("fs")
+const express = require("express")
+
+const app = express()
+const port = process.env.PORT || 3000
+
+function run(scriptPath, callback) {
+    // keep track of whether callback has been invoked to prevent multiple invocations
+    var invoked = false
+
+    var process = childProcess.fork(scriptPath)
+
+    // listen for errors as they may prevent the exit event from firing
+    process.on("error", function (err) {
+        if (invoked) return
+        invoked = true
+        callback(err)
+    })
+
+    // execute the callback once the process has finished running
+    process.on("exit", function (code) {
+        if (invoked) return
+        invoked = true
+        var err = code === 0 ? null : new Error("exit code " + code)
+        callback(err)
+    })
+}
+
+function runScript(script) {
+    return new Promise((resolve, reject) => {
+        // Now we can run a script and invoke a callback when complete, e.g.
+        run(`./${script}`, function (err) {
+            if (err) reject(err)
+            resolve(`FINISHED RUNNING ${script} \n`)
+        })
+    })
+}
+
+function log(msg) {
+    console.log(`----> ${msg} `)
+}
+
+function go() {
+    console.log("----> Starting confirmation service!!")
+    runScript("sessions_service.js").then((msg) => {
+        log(msg)
+        runScript("email_controller.js").then((msg) => {
+            log(msg)
+            runScript("email_service.js").then((msg) => {
+                log(msg)
+                console.log("\n******Waiting for next api poll...*******")
+            })
+        })
+    })
+}
+
+app.listen(port, () => {
+    console.log(
+        `Automatic email reminder listening at http://localhost:${port}`
+    )
+    go()
+    setInterval(() => go(), 60000 * 20)
+})

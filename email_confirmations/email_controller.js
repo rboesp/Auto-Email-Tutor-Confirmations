@@ -52,7 +52,9 @@ async function start() {
     sent by the email service*/
     let to_send = []
     upcoming_sessions.map((session) => {
-        let time = diff_hours(new Date(), new Date(session.data.startTime))
+        let time = diff_hours(new Date(), new Date(session.data.startTime)) //first arg is date now, second is date of session
+
+        //if we haven't sent email for session already, and within time frame, add to send pile
         if (!sent_ids.includes(session.id)) {
             if (time < time_frame) {
                 console.log(`Session within ${time_frame} hours!`)
@@ -61,7 +63,8 @@ async function start() {
         } else console.log("Already sent reminder email for this session!")
     })
 
-    await writeFileAsync("store/sessions_to_send.json", JSON.stringify(to_send))
+    await writeFileAsync("store/sessions_to_send.json", JSON.stringify(to_send)) //write to send pile to file
 }
 
+/*ENTRY POINT*/
 start()

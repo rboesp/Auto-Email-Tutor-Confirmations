@@ -30,11 +30,10 @@ async function start() {
     try {
         if (fileStr) toSend_sessions = JSON.parse(fileStr)
     } catch (err) {
-        throw new Error("File parse failed")
+        throw new Error(`File read failed: ${err}`)
     }
 
-    if (!toSend_sessions.length)
-        return console.log("No sessions to send email to!")
+    if (!toSend_sessions.length) return console.log("No sessions to send email to!")
 
     /* get the sessions that we have already sent emails to
     so the new sessions being sent now can be written to the file */
@@ -47,18 +46,12 @@ async function start() {
     }
 
     /*Sends confirmation emails to all the sessions that need one */
-    const new_sent_sessions = await sendConfirmationEmails(
-        toSend_sessions,
-        sent_sessions
-    )
+    const new_sent_sessions = await sendConfirmationEmails(toSend_sessions, sent_sessions)
 
     /*clear out to_send file and overwrite sent_sessions file 
     to make sure to not have duplicate confirmation emails sent*/
     await writeFileAsync("store/sessions_to_send.json", JSON.stringify([]))
-    await writeFileAsync(
-        "store/sent_sessions.json",
-        JSON.stringify(new_sent_sessions)
-    )
+    await writeFileAsync("store/sent_sessions.json", JSON.stringify(new_sent_sessions))
 }
 
 /** */
@@ -66,24 +59,19 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
     return new Promise((resolve, reject) => {
         let email_send_count = 0
         sessions_to_send.forEach(async (session, i) => {
-            console.log(session)
-            writeEmail(
-                session.data.email,
-                session.data.name,
-                session.data.startTime
-            )
-                .then((res) => {
-                    email_send_count++
-                    console.log(`Sent email to ${session.data.email}`)
-                    sent_sessions.push(session)
-                    if (email_send_count === sessions_to_send.length) {
-                        resolve(sent_sessions)
-                    }
-                })
-                .catch((err) => {
-                    console.log(err)
-                    reject()
-                })
+            try {
+                await writeEmail(session.data.email, session.data.name, session.data.startTime)
+            } catch (err) {
+                console.log(err)
+                reject()
+            }
+
+            console.log(`Successfully sent email to: ${session.data.email}`)
+
+            email_send_count++
+            sent_sessions.push(session)
+
+            if (email_send_count === sessions_to_send.length) resolve(sent_sessions)
         })
     })
 }
@@ -91,14 +79,11 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
 /** */
 const writeEmail = async (email, name, timestamp) => {
     const formatted_time = await date_time.formatTime(timestamp)
-    const formatted_date = await date_time.extractDate(
-        date_time.formatDate(timestamp)
-    )
+    const formatted_date = await date_time.extractDate(date_time.formatDate(timestamp))
 
     return new Promise((resolve, err) => {
-        console.log(
-            `Sending email to: ${name} at email ${email} for session at ${formatted_time}`
-        )
+        console.log(`Sending email to: ${name} at email ${email} for session at ${formatted_time}`)
+
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: `${email}`,

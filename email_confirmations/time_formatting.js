@@ -51,6 +51,14 @@ function formatDate(date) {
     return date.replace(pattern, replacement)
 }
 
+//gets the difference in hours between two date objects
+function diff_hours(dt2, dt1) {
+    var diff = (dt2.getTime() - dt1.getTime()) / 1000 //division converts from milliseconds to seconds
+    diff /= 3600 //60 seconds in minute * 60  minutes in hour
+    return Math.abs(Math.round(diff)) //no negatives
+}
+
 module.exports.formatDate = formatDate
 module.exports.formatTime = formatTime
 module.exports.getDate = extractDate
+module.exports.diff_hours = diff_hours

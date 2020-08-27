@@ -4,15 +4,25 @@ const util = require("util")
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
+//number of hours before the upcoming session the
+//program will use to decide whether or not to send an
+//email confirmation to the student
 const time_frame = 25
 
+//gets the difference in hours between two
+//date objects
 function diff_hours(dt2, dt1) {
     var diff = (dt2.getTime() - dt1.getTime()) / 1000
     diff /= 60 * 60
     return Math.abs(Math.round(diff))
 }
 
+//finds sessions which need a confirmation
+//email send to the student
 async function start() {
+    //
+
+    /*check which sessions are coming up*/
     const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
     let upcoming_sessions = []
     try {
@@ -20,8 +30,9 @@ async function start() {
     } catch (err) {
         throw new Error("File parse failed")
     }
-    // console.log(upcoming_sessions)
 
+    /*check which sessions we have already sent
+    an email confirmation to*/
     const sentFileStr = await readFileAsync("store/sent_sessions.json", "utf8")
     let sent_sessions = []
     try {
@@ -29,21 +40,18 @@ async function start() {
     } catch (err) {
         throw new Error("File parse failed")
     }
-    // if (sent_sessions) console.log(sent_sessions)
-    // else console.log("No sent sessions")
 
-    //first get id's of sent seshs in array then use that one in line 32
+    /*get sessions id's of sessions we have already sent */
     let sent_ids = []
     sent_sessions.forEach((session) => {
         sent_ids.push(session.id)
     })
 
-    // console.log(sent_ids)
-
-    //if any upcoming sessions not in sent sessions
+    /*if any upcoming sessions not in sent sessions file, 
+    store them in sessions_to_send file so they can be 
+    sent by the email service*/
     let to_send = []
     upcoming_sessions.map((session) => {
-        // console.log(session)
         let time = diff_hours(new Date(), new Date(session.data.startTime))
         if (!sent_ids.includes(session.id)) {
             if (time < time_frame) {
@@ -53,7 +61,6 @@ async function start() {
         } else console.log("Already sent reminder email for this session!")
     })
 
-    // console.log(to_send)
     await writeFileAsync("store/sessions_to_send.json", JSON.stringify(to_send))
 }
 

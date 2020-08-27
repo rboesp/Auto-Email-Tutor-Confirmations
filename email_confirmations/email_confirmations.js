@@ -1,9 +1,5 @@
 const childProcess = require("child_process")
 const fs = require("fs")
-const express = require("express")
-
-const app = express()
-const port = process.env.PORT || 3000
 
 function run(scriptPath, callback) {
     // keep track of whether callback has been invoked to prevent multiple invocations
@@ -41,24 +37,15 @@ function log(msg) {
     console.log(`----> ${msg} `)
 }
 
-function go() {
-    console.log("----> Starting confirmation service!!")
-    runScript("sessions_service.js").then((msg) => {
-        log(msg)
-        runScript("email_controller.js").then((msg) => {
-            log(msg)
-            runScript("email_service.js").then((msg) => {
-                log(msg)
-                console.log("\n******Waiting for next api poll...*******")
-            })
-        })
-    })
+async function getEmailConfirmations() {
+    log("Sending email confirmations!!")
+    let msg = await runScript("sessions_service.js")
+    log(msg)
+    msg = await runScript("email_controller.js")
+    log(msg)
+    msg = await runScript("email_service.js")
+    log(msg)
+    log("Done sending email confirmations!!")
 }
 
-app.listen(port, () => {
-    console.log(
-        `Automatic email reminder listening at http://localhost:${port}`
-    )
-    go()
-    setInterval(() => go(), 60000 * 20)
-})
+getEmailConfirmations()

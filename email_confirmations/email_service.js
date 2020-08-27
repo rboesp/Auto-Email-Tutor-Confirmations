@@ -2,11 +2,13 @@ const fs = require("fs")
 const util = require("util")
 require("dotenv").config()
 const nodemailer = require("nodemailer")
-const e = require("./email_text")
+const email_text = require("./email_text")
+const date_time = require("./time_formatting")
 
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
+/* Sets which account the emails will be sent from */
 let transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -18,7 +20,11 @@ let transporter = nodemailer.createTransport({
     },
 })
 
+/*Function that goes through process of sending confirmation emails */
 async function start() {
+    //
+
+    /* get sessions that need to be sent */
     const fileStr = await readFileAsync("store/sessions_to_send.json", "utf8")
     let toSend_sessions = []
     try {
@@ -30,6 +36,8 @@ async function start() {
     if (!toSend_sessions.length)
         return console.log("No sessions to send email to!")
 
+    /* get the sessions that we have already sent emails to
+    so the new sessions being sent now can be written to the file */
     const sentFileStr = await readFileAsync("store/sent_sessions.json", "utf8")
     let sent_sessions = []
     try {
@@ -38,20 +46,22 @@ async function start() {
         throw new Error("File parse failed")
     }
 
-    sendConfirmationEmails(toSend_sessions, sent_sessions).then(
-        async (sent_sessions) => {
-            await writeFileAsync(
-                "store/sessions_to_send.json",
-                JSON.stringify([])
-            )
-            await writeFileAsync(
-                "store/sent_sessions.json",
-                JSON.stringify(sent_sessions)
-            )
-        }
+    /*Sends confirmation emails to all the sessions that need one */
+    const new_sent_sessions = await sendConfirmationEmails(
+        toSend_sessions,
+        sent_sessions
+    )
+
+    /*clear out to_send file and overwrite sent_sessions file 
+    to make sure to not have duplicate confirmation emails sent*/
+    await writeFileAsync("store/sessions_to_send.json", JSON.stringify([]))
+    await writeFileAsync(
+        "store/sent_sessions.json",
+        JSON.stringify(new_sent_sessions)
     )
 }
 
+/** */
 function sendConfirmationEmails(sessions_to_send, sent_sessions) {
     return new Promise((resolve, reject) => {
         let email_send_count = 0
@@ -78,43 +88,23 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
     })
 }
 
-function getDate(time) {
-    return new Promise((resolve, reject) => {
-        let date = time.split("T")[0]
-        date = date.split("-")
-        date = date[1] + "/" + date[2]
-        if (!date) reject("Err with date")
-        resolve(date)
-    })
-}
-
-function formatTime(time) {
-    return new Promise((resolve, reject) => {
-        time = formatDate(time)
-        time = time.split("T")[1].split("-")[0]
-        if (!time) reject("Err with time")
-        resolve(time)
-    })
-}
-
-const writeEmail = async (email, name, time) => {
-    const send_time = await formatTime(time)
-    const date = await getDate(formatDate(time))
+/** */
+const writeEmail = async (email, name, timestamp) => {
+    const formatted_time = await date_time.formatTime(timestamp)
+    const formatted_date = await date_time.extractDate(
+        date_time.formatDate(timestamp)
+    )
 
     return new Promise((resolve, err) => {
-        console.log(date)
-        console.log(send_time)
+        console.log(
+            `Sending email to: ${name} at email ${email} for session at ${formatted_time}`
+        )
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: `${email}`,
             cc: "centralsupport@bootcampspot.com",
-            subject: `Coding Boot Camp - Tutor Confirmation - ${date} ${send_time} PST`,
-            text: e.email_body(
-                name,
-                send_time,
-                "https://us04web.zoom.us/j/79938221437?pwd=dksrN3dtOVduQ1JSbVpuV3M4Q0dzZz09",
-                "6HUuS2"
-            ),
+            subject: `Coding Boot Camp - Tutor Confirmation - ${formatted_date} ${formatted_time} PST`,
+            text: email_text.email_body(name, formatted_time),
         }
 
         transporter.sendMail(mailOptions, function (error, info) {
@@ -130,35 +120,3 @@ const writeEmail = async (email, name, time) => {
 
 /*ENTRY POINT*/
 start()
-
-//from https://stackoverflow.com/questions/4898574/converting-24-hour-time-to-12-hour-time-w-am-pm-using-javascript
-function formatDate(date) {
-    var d = new Date(date)
-    var hh = d.getHours()
-    var m = d.getMinutes()
-    var s = d.getSeconds()
-    var dd = "am"
-    var h = hh
-    if (h >= 12) {
-        h = hh - 12
-        dd = "pm"
-    }
-    if (h == 0) {
-        h = 12
-    }
-    m = m < 10 ? "0" + m : m
-
-    s = s < 10 ? "0" + s : s
-
-    /* if you want 2 digit hours:
-    h = h<10?"0"+h:h; */
-
-    var pattern = new RegExp("0?" + hh + ":" + m + ":" + s)
-
-    var replacement = h + ":" + m
-    /* if you want to add seconds
-    replacement += ":"+s;  */
-    replacement += " " + dd
-
-    return date.replace(pattern, replacement)
-}

@@ -60,5 +60,5 @@ function diff_hours(dt2, dt1) {
 
 module.exports.formatDate = formatDate
 module.exports.formatTime = formatTime
-module.exports.getDate = extractDate
+module.exports.extractDate = extractDate
 module.exports.diff_hours = diff_hours

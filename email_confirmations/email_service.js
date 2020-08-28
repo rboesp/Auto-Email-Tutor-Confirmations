@@ -23,6 +23,7 @@ let transporter = nodemailer.createTransport({
 /*Function that goes through process of sending confirmation emails */
 async function start() {
     //
+    console.log("**********************")
 
     /* get sessions that need to be sent */
     const fileStr = await readFileAsync("store/sessions_to_send.json", "utf8")
@@ -52,6 +53,7 @@ async function start() {
     to make sure to not have duplicate confirmation emails sent*/
     await writeFileAsync("store/sessions_to_send.json", JSON.stringify([]))
     await writeFileAsync("store/sent_sessions.json", JSON.stringify(new_sent_sessions))
+    console.log("**********************")
 }
 
 /** */
@@ -66,12 +68,13 @@ function sendConfirmationEmails(sessions_to_send, sent_sessions) {
                 reject()
             }
 
-            console.log(`Successfully sent email to: ${session.data.email}`)
-
             email_send_count++
             sent_sessions.push(session)
 
-            if (email_send_count === sessions_to_send.length) resolve(sent_sessions)
+            if (email_send_count === sessions_to_send.length) {
+                console.log("") //cmd formatting space
+                resolve(sent_sessions)
+            }
         })
     })
 }
@@ -83,11 +86,12 @@ const writeEmail = async (email, name, timestamp) => {
 
     return new Promise((resolve, err) => {
         console.log(`Sending email to: ${name} at email ${email} for session at ${formatted_time}`)
-
+        //centralsupport@bootcampspot.com
+        //${email}
         let mailOptions = {
             from: "rboesp@gmail.com",
-            to: `${email}`,
-            cc: "centralsupport@bootcampspot.com",
+            to: `rboesp@gmail.com`,
+            cc: "",
             subject: `Coding Boot Camp - Tutor Confirmation - ${formatted_date} ${formatted_time} PST`,
             text: email_text.email_body(name, formatted_time),
         }
@@ -96,7 +100,7 @@ const writeEmail = async (email, name, timestamp) => {
             if (error) {
                 err(error)
             } else {
-                console.log("Email sent: " + info.response)
+                console.log(`Email sent: ${info.response} \n`)
                 resolve()
             }
         })

@@ -86,12 +86,11 @@ const writeEmail = async (email, name, timestamp) => {
 
     return new Promise((resolve, err) => {
         console.log(`Sending email to: ${name} at email ${email} for session at ${formatted_time}`)
-        //centralsupport@bootcampspot.com
-        //${email}
+
         let mailOptions = {
             from: "rboesp@gmail.com",
-            to: `rboesp@gmail.com`,
-            cc: "",
+            to: `${email}`,
+            cc: "centralsupport@bootcampspot.com",
             subject: `Coding Boot Camp - Tutor Confirmation - ${formatted_date} ${formatted_time} PST`,
             text: email_text.email_body(name, formatted_time),
         }

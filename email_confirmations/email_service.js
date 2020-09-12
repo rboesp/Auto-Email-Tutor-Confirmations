@@ -90,7 +90,7 @@ const writeEmail = async (email, name, timestamp) => {
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: `${email}`,
-            cc: "centralsupport@bootcampspot.com",
+            cc: "centraltutorsupport@bootcampspot.com",
             subject: `Coding Boot Camp - Tutor Confirmation - ${formatted_date} ${formatted_time} PST`,
             text: email_text.email_body(name, formatted_time),
         }

@@ -24,11 +24,7 @@ fs.readFile("credentials.json", (err, content) => {
  */
 function authorize(credentials, callback) {
     const { client_secret, client_id, redirect_uris } = credentials.installed
-    const oAuth2Client = new google.auth.OAuth2(
-        client_id,
-        client_secret,
-        redirect_uris[0]
-    )
+    const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
 
     // Check if we have previously stored a token.
     fs.readFile(TOKEN_PATH, (err, token) => {
@@ -57,11 +53,7 @@ function getNewToken(oAuth2Client, callback) {
     rl.question("Enter the code from that page here: ", (code) => {
         rl.close()
         oAuth2Client.getToken(code, (err, token) => {
-            if (err)
-                return console.error(
-                    "Error while trying to retrieve access token",
-                    err
-                )
+            if (err) return console.error("Error while trying to retrieve access token", err)
             oAuth2Client.setCredentials(token)
             // Store the token to disk for later program executions
             fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
@@ -189,12 +181,10 @@ const writeEmailToAll = async (emails) => {
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: ``,
-            cc: "centralsupport@bootcampspot.com",
+            cc: "centraltutorsupport@bootcampspot.com",
             bcc: `${e_arr}`,
             subject: `Coding Boot Camp - Tutor Available`,
-            html: e.email_body(
-                "https://calendly.com/robertboespflug/tutorial-session"
-            ),
+            html: e.email_body("https://calendly.com/robertboespflug/tutorial-session"),
         }
 
         transporter.sendMail(mailOptions, function (error, info) {

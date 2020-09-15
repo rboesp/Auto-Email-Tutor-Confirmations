@@ -45,7 +45,7 @@ async function start() {
     sent by the email service*/
     let to_send = []
     upcoming_sessions.map((session) => {
-        console.log(session)
+        // console.log(session)
         //if we sent email already to session skip
         if (sent_ids.includes(session.id)) return
 

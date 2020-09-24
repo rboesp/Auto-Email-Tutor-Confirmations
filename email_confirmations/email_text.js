@@ -6,7 +6,7 @@ Thank you for scheduling your session with me. I am looking forward to our sessi
 	
 If something comes up and the scheduled time will not work, let me know a minimum of 6 hours before the appointment time and we’ll figure something out.
 	
-This session will take place here: https://us04web.zoom.us/j/79938221437?pwd=dksrN3dtOVduQ1JSbVpuV3M4Q0dzZz09
+This session will take place here: https://us04web.zoom.us/j/4030874806?pwd=Ynd4YTAvWVlyRk9VclpBNkIybUxpZz09
 
     (If you have not used zoom before please join the meeting at least 15 minutes early because it may have you download and install some software.)
 

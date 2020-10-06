@@ -55,11 +55,7 @@ fs.readFile("credentials.json", (err, content) => {
  */
 function authorize(credentials, callback) {
     const { client_secret, client_id, redirect_uris } = credentials.installed
-    const oAuth2Client = new google.auth.OAuth2(
-        client_id,
-        client_secret,
-        redirect_uris[0]
-    )
+    const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
 
     // Check if we have previously stored a token.
     fs.readFile(TOKEN_PATH, (err, token) => {
@@ -129,10 +125,7 @@ const handleResponse = async (err, res) => {
     if (!events.length) return console.log("No Events!")
     let savedSessions
     try {
-        const fileStr = await readFileAsync(
-            "store/upcoming_sessions.json",
-            "utf8"
-        )
+        const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
         if (fileStr) savedSessions = JSON.parse(fileStr)
     } catch (err) {
         throw new Error("File parse failed")
@@ -145,15 +138,11 @@ const handleResponse = async (err, res) => {
 
 const checkForNewSessions = async (sessionList, calendar_sessions) => {
     for (let i = 0; i < calendar_sessions.length; i++) {
-        const idSavedAlready =
-            sessionList.saved_sessions[`${calendar_sessions[i].id}`]
+        const idSavedAlready = sessionList.saved_sessions[`${calendar_sessions[i].id}`]
         if (!idSavedAlready) {
             //finding a new session not saved before
             console.log("**Found new sessions to put in email queue!**")
-            await writeFileAsync(
-                "store/upcoming_sessions.json",
-                JSON.stringify(calendar_sessions)
-            )
+            await writeFileAsync("store/upcoming_sessions.json", JSON.stringify(calendar_sessions))
             i = calendar_sessions.length
         }
     }
@@ -209,12 +198,7 @@ const getSessionProperties = (validEvent) => {
     const session_time = validEvent.start.dateTime
     const event_id = validEvent.id
 
-    const session = new Session(
-        event_id,
-        student.email,
-        student_name,
-        session_time
-    )
+    const session = new Session(event_id, student.email, student_name, session_time)
     return session
 }
 

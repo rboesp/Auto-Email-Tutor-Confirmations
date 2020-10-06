@@ -90,13 +90,13 @@ function listMajors(auth) {
     const sheets = google.sheets({ version: "v4", auth })
     sheets.spreadsheets.values.get(
         {
-            spreadsheetId: "1hiRdYWOxF1-yYHqIcSr8ebGiCLXTQXvgNbqqFtSLPqY",
+            spreadsheetId: "1rr4_HHt3B8Ci4lIP-EK6pn2DD2XIFh4G_zzclBzUlpA",
             range: "Student Roster!C3:D200",
         },
         (err, res) => {
             if (err) return console.log("The API returned an error: " + err)
             const rows = res.data.values
-            console.log(rows)
+            // console.log(rows)
             let stu_name = rows[rows.length - 1][0]
             let stu_email = rows[rows.length - 1][1]
             stu_name = stu_name.split(" ")[0]

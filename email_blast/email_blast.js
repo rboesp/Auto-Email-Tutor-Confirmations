@@ -12,6 +12,18 @@ const connect_to_google = require("./google")
 const readFileAsync = util.promisify(fs.readFile)
 const writeFileAsync = util.promisify(fs.writeFile)
 
+/* Sets which account the emails will be sent from */
+let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: "rboesp@gmail.com",
+        pass: process.env.GMAIL_PASSWORD,
+    },
+    tls: {
+        rejectUnauthorized: false,
+    },
+})
+
 /**
  * Writes to actual email blast to all the addresses passed in
  * @param {Object} emails

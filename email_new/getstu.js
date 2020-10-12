@@ -5,7 +5,7 @@ const { google } = require("googleapis")
 const util = require("util")
 require("dotenv").config()
 const nodemailer = require("nodemailer")
-const e = require("./email_text")
+const email_text = require("./email_text")
 
 const readFileAsync = util.promisify(fs.readFile)
 
@@ -17,7 +17,7 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 // time.
 const TOKEN_PATH = "token.json"
 
-const transporter = nodemailer.createTransport({
+const email_service = nodemailer.createTransport({
     service: "gmail",
     auth: {
         user: "rboesp@gmail.com",
@@ -121,10 +121,10 @@ function writeEmail(email, name) {
         to: `${email}`,
         cc: "centraltutorsupport@bootcampspot.com",
         subject: `Coding Boot Camp - Tutor Available`,
-        html: e.email_body(name),
+        html: email_text.email_body(name),
     }
     return new Promise((resolve, err) => {
-        transporter.sendMail(mailOptions, function (error, info) {
+        email_service.sendMail(mailOptions, function (error, info) {
             if (error) {
                 err(error)
             } else {

@@ -17,7 +17,7 @@ const SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 // time.
 const TOKEN_PATH = "token.json"
 
-let transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
         user: "rboesp@gmail.com",
@@ -27,6 +27,11 @@ let transporter = nodemailer.createTransport({
         rejectUnauthorized: false,
     },
 })
+
+const sheetOptions = {
+    spreadsheetId: process.env.spreadsheetId,
+    range: process.env.spreadsheetRange,
+}
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -42,10 +47,9 @@ async function authorize(credentials, callback) {
         // Check if we have previously stored a token.
         const token = await readFileAsync(TOKEN_PATH)
         oAuth2Client.setCredentials(JSON.parse(token))
-        console.log('done');
         return oAuth2Client
     } catch (error) {
-        console.log('hi');
+        console.log('**GENERATING NEW TOKEN**');
         return generateNewToken()
     }
 }
@@ -85,33 +89,29 @@ function getNewToken(oAuth2Client, callback) {
     })
 }
 
+
+const handleSheetsApiResponse = (err, res) => {
+    if (err) throw new Error('**NO API KEY**')
+    const rows = res.data.values
+    let stu_name = rows[rows.length - 1][0]
+    let stu_email = rows[rows.length - 1][1]
+    stu_name = stu_name.split(" ")[0]
+    console.log(stu_email)
+
+    /*to test comment out below*/
+    await writeEmail(stu_email, stu_name) 
+    console.log("Done writing email")
+}
+
+
 /**
  * Prints the names and majors of students in a sample spreadsheet:
  * @see https://docs.google.com/spreadsheets/d/1hiRdYWOxF1-yYHqIcSr8ebGiCLXTQXvgNbqqFtSLPqY/edit
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-function getNewStudent(auth) {
-    console.log('in');
+async function getNewStudent(auth) {
     const sheets = google.sheets({ version: "v4", auth })
-    sheets.spreadsheets.values.get(
-        {
-            spreadsheetId: "1rr4_HHt3B8Ci4lIP-EK6pn2DD2XIFh4G_zzclBzUlpA",
-            range: "Student Roster!C3:D200",
-        },
-        (err, res) => {
-            if (err) return console.log("The API returned an error: " + err)
-            const rows = res.data.values
-            // console.log(rows)
-            let stu_name = rows[rows.length - 1][0]
-            let stu_email = rows[rows.length - 1][1]
-            stu_name = stu_name.split(" ")[0]
-            // console.log(stu_name)
-            console.log(stu_email)
-            writeEmail(stu_email, stu_name).then((res) => {
-                console.log("Done writing email")
-            })
-        }
-    )
+    sheets.spreadsheets.values.get(sheetOptions, handleSheetsApiResponse)
 }
 
 //cc and real email later
@@ -145,7 +145,7 @@ const start = async () => {
         let api_key = await authorize(JSON.parse(content))
 
         //call the Google Sheets API
-        if(api_key) getNewStudent(api_key)
+        getNewStudent(api_key)
 
     } catch (error) {
         console.log(error)

@@ -7,6 +7,9 @@ require("dotenv").config()
 const nodemailer = require("nodemailer")
 const e = require("./email_text")
 
+const readFileAsync = util.promisify(fs.readFile)
+
+
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 // The file token.json stores the user's access and refresh tokens, and is
@@ -25,29 +28,30 @@ let transporter = nodemailer.createTransport({
     },
 })
 
-// Load client secrets from a local file.
-fs.readFile("credentials.json", (err, content) => {
-    if (err) return console.log("Error loading client secret file:", err)
-    // Authorize a client with credentials, then call the Google Sheets API.
-    authorize(JSON.parse(content), listMajors)
-})
-
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
+async function authorize(credentials, callback) {
     const { client_secret, client_id, redirect_uris } = credentials.installed
     const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0])
 
-    // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) return getNewToken(oAuth2Client, callback)
+    try {
+        // Check if we have previously stored a token.
+        const token = await readFileAsync(TOKEN_PATH)
         oAuth2Client.setCredentials(JSON.parse(token))
-        callback(oAuth2Client)
-    })
+        console.log('done');
+        return oAuth2Client
+    } catch (error) {
+        console.log('hi');
+        return generateNewToken()
+    }
+}
+
+function generateNewToken() {
+    return getNewToken(oAuth2Client, getNewStudent)
 }
 
 /**
@@ -86,7 +90,8 @@ function getNewToken(oAuth2Client, callback) {
  * @see https://docs.google.com/spreadsheets/d/1hiRdYWOxF1-yYHqIcSr8ebGiCLXTQXvgNbqqFtSLPqY/edit
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-function listMajors(auth) {
+function getNewStudent(auth) {
+    console.log('in');
     const sheets = google.sheets({ version: "v4", auth })
     sheets.spreadsheets.values.get(
         {
@@ -100,7 +105,7 @@ function listMajors(auth) {
             let stu_name = rows[rows.length - 1][0]
             let stu_email = rows[rows.length - 1][1]
             stu_name = stu_name.split(" ")[0]
-            console.log(stu_name)
+            // console.log(stu_name)
             console.log(stu_email)
             writeEmail(stu_email, stu_name).then((res) => {
                 console.log("Done writing email")
@@ -111,15 +116,14 @@ function listMajors(auth) {
 
 //cc and real email later
 function writeEmail(email, name) {
+    let mailOptions = {
+        from: "rboesp@gmail.com",
+        to: `${email}`,
+        cc: "centraltutorsupport@bootcampspot.com",
+        subject: `Coding Boot Camp - Tutor Available`,
+        html: e.email_body(name),
+    }
     return new Promise((resolve, err) => {
-        let mailOptions = {
-            from: "rboesp@gmail.com",
-            to: `${email}`,
-            cc: "centraltutorsupport@bootcampspot.com",
-            subject: `Coding Boot Camp - Tutor Available`,
-            html: e.email_body(name),
-        }
-
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 err(error)
@@ -130,3 +134,21 @@ function writeEmail(email, name) {
         })
     })
 }
+
+/*ENTRY POINT */
+const start = async () => {
+    try {
+        // Load client secrets from a local file
+        const content = await readFileAsync("credentials.json")
+
+        // Authorize a client with credentials
+        let api_key = await authorize(JSON.parse(content))
+
+        //call the Google Sheets API
+        if(api_key) getNewStudent(api_key)
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+start()

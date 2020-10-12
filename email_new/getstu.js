@@ -111,7 +111,7 @@ function listMajors(auth) {
 
 //cc and real email later
 function writeEmail(email, name) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, err) => {
         let mailOptions = {
             from: "rboesp@gmail.com",
             to: `${email}`,

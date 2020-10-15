@@ -90,7 +90,7 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 
-const handleSheetsApiResponse = (err, res) => {
+const handleSheetsApiResponse = async (err, res) => {
     if (err) throw new Error('**NO API KEY**')
     const rows = res.data.values
     let stu_name = rows[rows.length - 1][0]
@@ -109,7 +109,7 @@ const handleSheetsApiResponse = (err, res) => {
  * @see https://docs.google.com/spreadsheets/d/1hiRdYWOxF1-yYHqIcSr8ebGiCLXTQXvgNbqqFtSLPqY/edit
  * @param {google.auth.OAuth2} auth The authenticated Google OAuth client.
  */
-async function getNewStudent(auth) {
+function getNewStudent(auth) {
     const sheets = google.sheets({ version: "v4", auth })
     sheets.spreadsheets.values.get(sheetOptions, handleSheetsApiResponse)
 }

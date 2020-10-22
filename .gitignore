@@ -6,4 +6,4 @@ npm-debug.log
 token.json
 credentials.json
 store/
-email_blast/last_blast.txt
+last_blast.txt

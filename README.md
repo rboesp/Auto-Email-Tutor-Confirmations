@@ -1,1 +1,1 @@
-# automated_email_confirmations
+# Uses node.js

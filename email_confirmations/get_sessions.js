@@ -130,9 +130,10 @@ const handleResponse = async (err, res) => {
     } catch (err) {
         throw new Error("File parse failed")
     }
+    // console.log(events);
     let calendar_sessions = getTutoringSessionsFromEvents(events)
     let sessionList = new SavedSessionList(savedSessions)
-    // console.log(sessionList)
+    console.log(sessionList)
     checkForNewSessions(sessionList, calendar_sessions)
 }
 
@@ -166,7 +167,7 @@ const getTutoringSessionsFromEvents = (events) => {
         if (!session) return
         sessions.push(session)
     })
-    // console.log(sessions)
+    console.log(sessions)
     return sessions
 }
 
@@ -177,6 +178,7 @@ const getTutoringSessionsFromEvents = (events) => {
  * @returns {array}
  */
 const getSessionProperties = (validEvent) => {
+    // console.log(validEvent);
     // console.log(validEvent.attendees)
     // console.log(time)
     let student_name = validEvent.summary.split(" and ")[0]
@@ -187,10 +189,11 @@ const getSessionProperties = (validEvent) => {
     // console.log(student_name)
 
     let student //find way to re-do this and make it const
-    validEvent.attendees.forEach((attendee) => {
-        student = filterStudentFromAttendees(attendee)
+    // console.log(validEvent.attendees);
+    validEvent.attendees.forEach((attendees) => {
+        student = filterStudentFromAttendees(attendees)
     })
-
+    // console.log(student);
     if (!student) {
         return //either no attendees or only myself, skip this session
     }
@@ -208,9 +211,9 @@ const getSessionProperties = (validEvent) => {
  * @returns {Object}
  */
 const filterStudentFromAttendees = (attendees) => {
-    // console.log(attendee)
-    if (!attendees.organizer) {
+    // console.log(attendees)
+    // if (!attendees.organizer) {
         // console.log(attendee)
         return attendees
-    }
+    // }
 }

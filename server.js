@@ -44,9 +44,10 @@ function log(msg) {
 
 async function getEmailConfirmations() {
     log("Sending email confirmations!!")
-    const url = path.join(__dirname, '/email_confirmations/email_confirmations.js')
-    console.log(url);
-    // let msg = await runScript()
+    // console.log(path.dirname('/email_confirmations/email_confirmations.js'));
+    // const url = path.join(__dirname, '/email_confirmations/email_confirmations.js')
+    // console.log(url);
+    let msg = await runScript('/email_confirmations/email_confirmations.js')
 }
 
 app.get('/', (req, res) => {

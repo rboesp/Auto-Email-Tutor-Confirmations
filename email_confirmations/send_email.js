@@ -26,7 +26,7 @@ async function start() {
     console.log("**********************")
 
     /* get sessions that need to be sent */
-    const fileStr = await readFileAsync("store/sessions_to_send.json", "utf8")
+    const fileStr = await readFileAsync("email_confirmations/store/sessions_to_send.json", "utf8")
     let toSend_sessions = []
     try {
         if (fileStr) toSend_sessions = JSON.parse(fileStr)
@@ -38,7 +38,7 @@ async function start() {
 
     /* get the sessions that we have already sent emails to
     so the new sessions being sent now can be written to the file */
-    const sentFileStr = await readFileAsync("store/sent_sessions.json", "utf8")
+    const sentFileStr = await readFileAsync("email_confirmations/store/sent_sessions.json", "utf8")
     let sent_sessions = []
     try {
         if (sentFileStr) sent_sessions = JSON.parse(sentFileStr)
@@ -51,8 +51,8 @@ async function start() {
 
     /*clear out to_send file and overwrite sent_sessions file 
     to make sure to not have duplicate confirmation emails sent*/
-    await writeFileAsync("store/sessions_to_send.json", JSON.stringify([]))
-    await writeFileAsync("store/sent_sessions.json", JSON.stringify(new_sent_sessions))
+    await writeFileAsync("email_confirmations/store/sessions_to_send.json", JSON.stringify([]))
+    await writeFileAsync("email_confirmations/store/sent_sessions.json", JSON.stringify(new_sent_sessions))
     console.log("**********************")
 }
 

@@ -39,11 +39,11 @@ function log(msg) {
 
 async function getEmailConfirmations() {
     log("Sending email confirmations!!")
-    let msg = await runScript("get_sessions.js")
+    let msg = await runScript("email_confirmations/get_sessions.js")
     log(msg)
-    msg = await runScript("email_controller.js")
+    msg = await runScript("email_confirmations/email_controller.js")
     log(msg)
-    msg = await runScript("send_email.js")
+    msg = await runScript("email_confirmations/send_email.js")
     log(msg)
     log("Done sending email confirmations!!")
 }

@@ -125,7 +125,7 @@ const handleResponse = async (err, res) => {
     if (!events.length) return console.log("No Events!")
     let savedSessions
     try {
-        const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
+        const fileStr = await readFileAsync("email_confirmations/store/upcoming_sessions.json", "utf8")
         if (fileStr) savedSessions = JSON.parse(fileStr)
     } catch (err) {
         throw new Error("File parse failed")
@@ -143,7 +143,7 @@ const checkForNewSessions = async (sessionList, calendar_sessions) => {
         if (!idSavedAlready) {
             //finding a new session not saved before
             console.log("**Found new sessions to put in email queue!**")
-            await writeFileAsync("store/upcoming_sessions.json", JSON.stringify(calendar_sessions))
+            await writeFileAsync("email_confirmations/store/upcoming_sessions.json", JSON.stringify(calendar_sessions))
             i = calendar_sessions.length
         }
     }

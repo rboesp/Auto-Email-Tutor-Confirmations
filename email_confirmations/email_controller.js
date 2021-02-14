@@ -16,7 +16,7 @@ async function start() {
     //
 
     /*check which sessions are coming up*/
-    const fileStr = await readFileAsync("store/upcoming_sessions.json", "utf8")
+    const fileStr = await readFileAsync("email_confirmations/store/upcoming_sessions.json", "utf8")
     let upcoming_sessions = []
     try {
         if (fileStr) upcoming_sessions = JSON.parse(fileStr)
@@ -26,7 +26,7 @@ async function start() {
 
     /*check which sessions we have already sent
     an email confirmation to*/
-    const sentFileStr = await readFileAsync("store/sent_sessions.json", "utf8")
+    const sentFileStr = await readFileAsync("email_confirmations/store/sent_sessions.json", "utf8")
     let sent_sessions = []
     try {
         if (sentFileStr) sent_sessions = JSON.parse(sentFileStr)
@@ -61,7 +61,7 @@ async function start() {
         }
     })
 
-    await writeFileAsync("store/sessions_to_send.json", JSON.stringify(to_send)) //write to_send pile to file
+    await writeFileAsync("email_confirmations/store/sessions_to_send.json", JSON.stringify(to_send)) //write to_send pile to file
 }
 
 /*ENTRY POINT*/

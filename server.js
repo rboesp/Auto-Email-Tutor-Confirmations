@@ -55,6 +55,8 @@ app.get('/session-confirmations', (req, res) => {
     getEmailConfirmations()
 })
 
+//not so! haha
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
